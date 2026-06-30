@@ -9,9 +9,9 @@ export function setupApplication(app: INestApplication): void {
   app.setGlobalPrefix('api');
   app.use(helmet());
 
-  const allowedOrigins = configService.get<string>('ALLOWED_ORIGINS');
+  const allowedOrigins = configService.get<string[]>('app.cors.origins', []);
   app.enableCors({
-    origin: allowedOrigins ? allowedOrigins.split(',') : true,
+    origin: allowedOrigins.length > 0 ? allowedOrigins : true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
