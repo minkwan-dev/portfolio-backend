@@ -1,14 +1,17 @@
 import { ClassSerializerInterceptor, INestApplication, ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
 import helmet from 'helmet';
 
 export function setupApplication(app: INestApplication): void {
-  app.setGlobalPrefix('api');
+  const configService = app.get(ConfigService);
 
+  app.setGlobalPrefix('api');
   app.use(helmet());
 
+  const allowedOrigins = configService.get<string>('ALLOWED_ORIGINS');
   app.enableCors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || true,
+    origin: allowedOrigins ? allowedOrigins.split(',') : true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
