@@ -1,35 +1,17 @@
-import { ClassSerializerInterceptor, INestApplication, ValidationPipe } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { Reflector } from '@nestjs/core';
-import helmet from 'helmet';
-import { HttpExceptionFilter } from 'src/common/filters/http-exception.filter';
+import { INestApplication } from '@nestjs/common';
+import { AppConfig, getAppConfig } from '@/setup/config/get-app-config';
+import { setupFilters } from '@/setup/filters/setup';
+import { setupInterceptors } from '@/setup/interceptors/setup';
+import { setupMiddleware } from '@/setup/middleware/setup';
+import { setupPipes } from '@/setup/pipes/setup';
 
-export function setupApplication(app: INestApplication): void {
-  const configService = app.get(ConfigService);
+export function setupApplication(app: INestApplication): AppConfig {
+  const config = getAppConfig(app);
 
-  app.setGlobalPrefix('api');
-  app.use(helmet());
+  setupMiddleware(app, config);
+  setupPipes(app);
+  setupInterceptors(app);
+  setupFilters(app);
 
-  const allowedOrigins = configService.get<string[]>('app.cors.origins', []);
-  app.enableCors({
-    origin: allowedOrigins.length > 0 ? allowedOrigins : true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  });
-
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }),
-  );
-
-  app.useGlobalInterceptors(
-    new ClassSerializerInterceptor(app.get(Reflector)),
-  );
-
-  app.useGlobalFilters(
-    new HttpExceptionFilter()
-  );
+  return config;
 }
