@@ -1,15 +1,13 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { getDatabaseConfig } from '@/setup/config/get-database-config';
+import { DatabaseConfigService } from '@/modules/config/database/database-config.service';
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const db = getDatabaseConfig(configService);
+      inject: [DatabaseConfigService],
+      useFactory: (databaseConfigService: DatabaseConfigService) => {
+        const db = databaseConfigService.config;
 
         return {
           type: 'mysql',
@@ -26,4 +24,5 @@ import { getDatabaseConfig } from '@/setup/config/get-database-config';
     }),
   ],
 })
+
 export class DatabaseModule {}
