@@ -17,4 +17,5 @@ import { DatabaseConfigService } from '@/modules/config/database/database-config
   providers: [AppConfigService, DatabaseConfigService],
   exports: [AppConfigService, DatabaseConfigService],
 })
+
 export class AppConfigModule {}
