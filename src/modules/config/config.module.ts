@@ -4,6 +4,7 @@ import appConfig from '@/modules/config/app/app.config';
 import databaseConfig from '@/modules/config/database/database.config';
 import { AppConfigService } from '@/modules/config/app/app-config.service';
 import { DatabaseConfigService } from '@/modules/config/database/database-config.service';
+import { envValidationSchema } from '@/modules/config/env.validation';
 
 @Global()
 @Module({
@@ -12,6 +13,10 @@ import { DatabaseConfigService } from '@/modules/config/database/database-config
       isGlobal: true,
       envFilePath: '.env',
       load: [appConfig, databaseConfig],
+      validationSchema: envValidationSchema,
+      validationOptions: {
+        abortEarly: true,
+      }
     }),
   ],
   providers: [AppConfigService, DatabaseConfigService],
