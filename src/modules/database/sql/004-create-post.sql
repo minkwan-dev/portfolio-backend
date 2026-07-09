@@ -1,0 +1,18 @@
+CREATE TABLE post (
+  id INT NOT NULL AUTO_INCREMENT,
+  series_id INT NULL,
+  series_order INT NULL,
+  title VARCHAR(255) NOT NULL,
+  short_description TEXT NULL,
+  thumbnail VARCHAR(500) NULL,
+  body LONGTEXT NOT NULL,
+  url_slug VARCHAR(255) NOT NULL,
+  is_temp TINYINT(1) NOT NULL DEFAULT 0,
+  comments_count INT NOT NULL DEFAULT 0,
+  released_at DATETIME NULL,
+  created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+  updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+  PRIMARY KEY (id),
+  UNIQUE (url_slug),
+  FOREIGN KEY (series_id) REFERENCES series (id)
+);
