@@ -1,11 +1,12 @@
-CREATE TABLE users {
-    id BIGINT NOT NULL AUTO_INCREMENT,
-    username VARCHAR(50) NOT NULL,
+CREATE TABLE user (
+    id INT NOT NULL AUTO_INCREMENT,
     email VARCHAR(255) NOT NULL,
-    thumbnailImg VARCHAR(2048) NULL,
-    short_bio VARCHAR(255) NULL,
-    provider VARCHAR(50) NULL,
-    password VARCHAR(50) NULL,
-    created_at t
-    updated_at
-}
+    google_sub VARCHAR(255) NOT NULL,  
+    name VARCHAR(50) NULL,             
+    picture VARCHAR(2048) NULL,        
+    created_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    PRIMARY KEY (id),
+    UNIQUE (email),
+    UNIQUE (google_sub)
+);
