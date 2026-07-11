@@ -1,5 +1,9 @@
 import { registerAs } from '@nestjs/config';
-import { AppConfig } from '@/modules/config/app/app-config.types';
+
+export type AppConfig = {
+  port: number;
+  corsOrigins: string[];
+};
 
 export function createAppConfigFromEnv(): AppConfig {
   return {

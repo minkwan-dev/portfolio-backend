@@ -1,5 +1,12 @@
 import { registerAs } from '@nestjs/config';
-import { DatabaseConfig } from '@/modules/config/database/database-config.types';
+
+export type DatabaseConfig = {
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  database: string;
+};
 
 export function createDatabaseConfigFromEnv(): DatabaseConfig {
   return {
