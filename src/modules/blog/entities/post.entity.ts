@@ -1,13 +1,13 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from '@/modules/database/base.entity';
-import { Series } from '@/modules/series/series.entity';
+import { Series } from '@/modules/blog/entities/series.entity';
 
 @Entity('post')
 export class Post extends BaseEntity {
-    @Column({ name: 'series_id', nullable: true })
+    @Column({ name: 'series_id', type: 'int', nullable: true })
     seriesId: number | null;
 
-    @Column({ name: 'series_order', nullable: true })
+    @Column({ name: 'series_order', type: 'int', nullable: true })
     seriesOrder: number | null;
 
     @Column({ type: 'varchar', length: 255 })
@@ -35,7 +35,6 @@ export class Post extends BaseEntity {
     releasedAt: Date | null;
 
     @ManyToOne(() => Series, { nullable: true })
-    
     @JoinColumn({ name: 'series_id' })
     series: Series | null;
 }

@@ -1,10 +1,10 @@
 import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from '@/modules/database/base.entity';
-import { Post } from '@/modules/post/post.entity';
+import { Post } from '@/modules/blog/entities/post.entity';
 
 @Entity('comment')
 export class Comment extends BaseEntity {
-    @Column({ name: 'post_id' })
+    @Column({ name: 'post_id', type: 'int' })
     postId: number;
 
     @Column({ type: 'varchar', length: 50 })
