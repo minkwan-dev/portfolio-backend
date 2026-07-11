@@ -1,4 +1,6 @@
 import { VelogClient } from "@/import/velog/client";
+import { Series } from "@/modules/blog/entities/series.entity";
+import { EntityManager } from "typeorm";
 
 export interface VelogSeries {
     id: string;
@@ -29,4 +31,32 @@ export async function fetchSeries(username: string): Promise<VelogSeries[]> {
     )
 
     return result.data.seriesList ?? [];
+}
+
+export async function upsertSeries(manager: EntityManager, item: VelogSeries): Promise<Series> {
+    const repo = manager.getRepository(Series);
+    const existing = await repo.findOne({ where: { urlSlug: item.url_slug }});
+
+    const payload = {
+        name: item.name,
+        urlSlug: item.url_slug,
+        description: item.description,
+        thumbnail: item.thumbnail,
+    };
+
+    if (existing) {
+        Object.assign(existing, payload);
+        return repo.save(existing);
+    }
+
+    return repo.save(repo.create(payload));
+}
+
+export async function importSeries(manager: EntityManager, username: string): Promise<void> {
+    const items = await fetchSeries(username);
+
+    for (const item of items) {
+        const saved = await upsertSeries(manager, item);
+        console.log(`[import-series] saved: ${saved.urlSlug} (id=${saved.id})`);
+    }
 }
