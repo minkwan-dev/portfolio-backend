@@ -35,7 +35,6 @@ export async function fetchSeries(username: string): Promise<VelogSeries[]> {
 
 export async function upsertSeries(manager: EntityManager, item: VelogSeries): Promise<Series> {
     const repo = manager.getRepository(Series);
-    const existing = await repo.findOne({ where: { urlSlug: item.url_slug }});
 
     const payload = {
         name: item.name,
@@ -44,12 +43,9 @@ export async function upsertSeries(manager: EntityManager, item: VelogSeries): P
         thumbnail: item.thumbnail,
     };
 
-    if (existing) {
-        Object.assign(existing, payload);
-        return repo.save(existing);
-    }
+    await repo.upsert(payload, ['urlSlug']);
 
-    return repo.save(repo.create(payload));
+    return repo.findOneOrFail({ where: { urlSlug: payload.urlSlug } });
 }
 
 export async function importSeries(manager: EntityManager, username: string): Promise<void> {
