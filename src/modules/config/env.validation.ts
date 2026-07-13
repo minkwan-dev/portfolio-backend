@@ -1,11 +1,8 @@
 import Joi from 'joi';
+import { appEnvValidationSchema } from '@/modules/config/app/app-env.validation';
+import { databaseEnvValidationSchema } from '@/modules/config/database/database-env.validation';
 
 export const envValidationSchema = Joi.object({
-  PORT: Joi.number().port().default(3000),
-  ALLOWED_ORIGINS: Joi.string().optional().allow(''),
-  DB_HOST: Joi.string().default('127.0.0.1'),
-  DB_PORT: Joi.number().port().default(3306),
-  DB_USERNAME: Joi.string().default('root'),
-  DB_PASSWORD: Joi.string().allow('').default(''),
-  DB_DATABASE: Joi.string().default('BLOG'),
+  ...appEnvValidationSchema,
+  ...databaseEnvValidationSchema,
 });

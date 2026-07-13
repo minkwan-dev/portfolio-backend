@@ -14,7 +14,6 @@ import { envValidationSchema } from '@/modules/config/env.validation';
       envFilePath: '.env',
       load: [appConfig, databaseConfig],
       validationSchema: envValidationSchema,
-      // validationSchema: Joi.object({...idfjdsfds,}),
       validationOptions: {
         abortEarly: true,
       }
