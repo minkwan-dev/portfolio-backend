@@ -1,4 +1,4 @@
-import { fetchPosts } from '@/import/velog/post';
+import { fetchPosts } from '@/velog/post';
 
 const username = process.env.VELOG_USERNAME ?? 'minkwan';
 

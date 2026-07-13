@@ -1,4 +1,4 @@
-import { VelogClient } from '@/import/velog/client';
+import { VelogClient } from '@/velog/client';
 
 export interface VelogPostSeries {
     url_slug: string;

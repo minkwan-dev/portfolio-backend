@@ -1,4 +1,4 @@
-import { VelogClient } from '@/import/velog/client';
+import { VelogClient } from '@/velog/client';
 
 const client = new VelogClient();
 const username = process.env.VELOG_USERNAME ?? 'minkwan';

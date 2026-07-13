@@ -1,4 +1,4 @@
-import { VelogClient } from "@/import/velog/client";
+import { VelogClient } from "@/velog/client";
 import { Series } from "@/modules/blog/entities/series.entity";
 import { EntityManager } from "typeorm";
 

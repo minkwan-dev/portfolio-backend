@@ -1,5 +1,5 @@
 import dataSource from "@/modules/database/data-source";
-import { importSeries } from "@/import/velog/series";
+import { importSeries } from "@/velog/series";
 
 async function main() {
     const username = process.env.VELOG_USERNAME ?? 'minkwan';
