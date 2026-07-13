@@ -5,7 +5,10 @@ import { setupApplication } from '@/setup/application.setup';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.setGlobalPrefix('api');
   setupApplication(app);
+  
   await app.listen(app.get(AppConfigService).config.port);
 }
 
