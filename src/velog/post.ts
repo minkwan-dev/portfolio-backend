@@ -1,4 +1,6 @@
 import { VelogClient } from '@/velog/client';
+import { EntityManager } from 'typeorm';
+import { Post, Series } from '@/modules/blog/entities/index';
 
 export interface VelogPostSeries {
     url_slug: string;
@@ -99,4 +101,48 @@ export async function fetchPosts(username: string): Promise<VelogPost[]> {
   }
 
   return result;
+}
+
+async function resolveSeriesId(manager: EntityManager, series: VelogPostSeries | null): Promise<number | null> {
+  if (!series) return null;
+
+  const found = await manager.getRepository(Series).findOne({ where: { urlSlug: series.url_slug } });
+
+  if (!found) {
+    throw new Error(`[import-post] series not found: ${series.url_slug}`);
+  }
+
+  return found.id;
+}
+
+export async function upsertPost(manager: EntityManager, item: VelogPost, seriesOrder: number | null): Promise<Post> {
+  const repo = manager.getRepository(Post);
+  const seriesId = await resolveSeriesId(manager, item.series);
+
+  const existing = await repo.findOne({ where: { urlSlug: item.url_slug } });
+
+  const payload = {
+    seriesId,
+    seriesOrder,
+    title: item.title,
+    shortDescription: item.short_description,
+    thumbnail: item.thumbnail,
+    body: item.body,
+    urlSlug: item.url_slug,
+    isTemp: item.is_temp,
+    releasedAt: item.released_at ? new Date(item.released_at) : null,
+  }
+
+  let saved: Post;
+
+  if (existing) {
+    Object.assign(existing, payload);
+    saved = await repo.save(existing);
+  } else {
+    saved = await repo.save(repo.create({ ...payload, commentsCount: 0 }));
+  }
+
+  console.log(`[import-post] saved: ${saved.urlSlug} (id=${saved.id})`);
+
+  return saved
 }
