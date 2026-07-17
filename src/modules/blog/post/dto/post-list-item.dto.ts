@@ -1,5 +1,4 @@
-import { Expose, Type } from "class-transformer";
-import { PostSeriesSummaryDto } from "./post-series-summary.dto";
+import { Expose } from 'class-transformer';
 
 export class PostListItemDto {
     @Expose()
@@ -12,21 +11,11 @@ export class PostListItemDto {
     urlSlug: string;
 
     @Expose()
-    shortDescription: string | null;
-
-    @Expose()
     thumbnail: string | null;
 
     @Expose()
     releasedAt: Date | null;
 
     @Expose()
-    @Type(() => PostSeriesSummaryDto)
-    series: PostSeriesSummaryDto | null;
-
-    @Expose()
     tags: string[];
-
-    @Expose()
-    commentsCount: number;
 }
