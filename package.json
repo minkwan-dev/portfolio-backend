@@ -20,7 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "typeorm-ts-node-commonjs -d src/modules/database/data-source.ts",
     "migration:generate": "pnpm typeorm migration:generate",
-    "migration:run": "pnpm typeorm migration:run"
+    "migration:run": "pnpm typeorm migration:run",
+    "import:velog": "ts-node -r tsconfig-paths/register src/velog/scripts/import-velog.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
