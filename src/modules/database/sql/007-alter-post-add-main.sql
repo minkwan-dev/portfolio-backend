@@ -1,0 +1,3 @@
+ALTER TABLE post
+    ADD COLUMN is_main TINYINT(1) NOT NULL DEFAULT 0 AFTER is_temp,
+    ADD COLUMN main_order INT NULL AFTER is_main;

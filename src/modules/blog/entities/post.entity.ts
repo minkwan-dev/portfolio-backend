@@ -28,6 +28,12 @@ export class Post extends BaseEntity {
     @Column({ name: 'is_temp', type: 'boolean', default: false })
     isTemp: boolean;
 
+    @Column({ name: 'is_main', type: 'boolean', default: false })
+    isMain: boolean;
+
+    @Column({ name: 'main_order', type: 'int', nullable: true })
+    mainOrder: number | null;
+
     @Column({ name: 'comments_count', type: 'int', default: 0 })
     commentsCount: number;
 
