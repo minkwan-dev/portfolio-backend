@@ -10,7 +10,7 @@ export class Comment extends BaseEntity {
     @Column({ type: 'varchar', length: 50 })
     nickname: string;
 
-    @Column({ type: 'varchar', length: 50 })
+    @Column({ type: 'varchar', length: 512 })
     avatar: string;
 
     @Column({ type: 'text' })

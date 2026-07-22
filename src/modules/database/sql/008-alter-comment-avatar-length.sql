@@ -1,0 +1,2 @@
+ALTER TABLE comment
+    MODIFY COLUMN avatar VARCHAR(512) NOT NULL;
