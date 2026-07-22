@@ -1,0 +1,15 @@
+UPDATE post SET is_main = 1, main_order = 1  WHERE url_slug = '상태-코드와-REST-API';
+UPDATE post SET is_main = 1, main_order = 2  WHERE url_slug = '백엔드와-데이터베이스-사이';
+UPDATE post SET is_main = 1, main_order = 3  WHERE url_slug = 'Mac-MySQL-설치-가이드';
+UPDATE post SET is_main = 1, main_order = 4  WHERE url_slug = '토큰-관리-방식-톺아보기';
+UPDATE post SET is_main = 1, main_order = 5  WHERE url_slug = 'React-배포-전-과정-톺아보기';
+UPDATE post SET is_main = 1, main_order = 6  WHERE url_slug = 'Nest-배포-전-과정-톺아보기';
+UPDATE post SET is_main = 1, main_order = 7  WHERE url_slug = 'Sentry를-이용한-프론트엔드-에러-추적';
+UPDATE post SET is_main = 1, main_order = 8  WHERE url_slug = '코드-리뷰-자동화-CodeRabbit';
+UPDATE post SET is_main = 1, main_order = 9  WHERE url_slug = '그래서-인터넷이-어떻게-동작해요';
+UPDATE post SET is_main = 1, main_order = 10 WHERE url_slug = 'Amazon-VPC-Architecture-이해하기';
+UPDATE post SET is_main = 1, main_order = 11 WHERE url_slug = 'TypeScript-Course';
+UPDATE post SET is_main = 1, main_order = 12 WHERE url_slug = 'AI-답변-대기시간-2분에서-10초로-개선';
+UPDATE post SET is_main = 1, main_order = 13 WHERE url_slug = 'Formatting-그리고-Linting';
+UPDATE post SET is_main = 1, main_order = 14 WHERE url_slug = 'NestJS-Overview-총정리';
+UPDATE post SET is_main = 1, main_order = 15 WHERE url_slug = '추상화가-깨지는-순간을-존중하기NestJS';
