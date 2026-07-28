@@ -4,7 +4,12 @@ import { randomUUID } from 'crypto';
 export const DICEBEAR_STYLE = 'lorelei-neutral';
 const DICEBEAR_BASE = 'https://api.dicebear.com/10.x';
 
-export const ADJECTIVES = [ '재미있는', '활기찬', '용감한', '조용한', '빠른', '느긋한', '반짝이는', '든든한' ] as const;
+export const ADJECTIVES = [
+    '재미있는', '활기찬', '용감한', '조용한', '빠른', '느긋한', '반짝이는', '든든한',
+    '상냥한', '씩씩한', '유쾌한', '다정한', '명랑한', '차분한', '호기심 많은',
+    '성실한', '따뜻한', '당당한', '센스 있는', '긍정적인', '친절한', '유머러스한',
+    '똑똑한', '엉뚱한', '용맹한', '소심한', '대담한', '온화한',
+  ] as const;
   
 export const MALE_NAMES = [ '영수', '영호', '영식', '영철', '광수', '상철' ] as const;
   
