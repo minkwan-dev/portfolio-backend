@@ -6,12 +6,6 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 export class CommentController {
     constructor(private readonly commentService: CommentService) {}
 
-    @Get('comments/identity')
-    previewIdentity() {
-        const data = this.commentService.previewIdentity();
-        return { data };
-    }
-
     @Get('posts/:postSlug/comments')
     async findByPost(@Param('postSlug') postSlug: string) {
         const data = await this.commentService.findByPostSlug(postSlug);
