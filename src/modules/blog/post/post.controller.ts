@@ -1,4 +1,5 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
+import { PostListQueryDto } from './dto/post-list-query.dto';
 import { PostService } from './post.service';
 
 @Controller('posts')
@@ -12,9 +13,8 @@ export class PostController {
     }
 
     @Get()
-    async findAll() {
-        const data = await this.postService.findAll();
-        return { data };
+    async findAll(@Query() query: PostListQueryDto) {
+        return this.postService.findAll(query);
     }
 
     @Get(':slug')

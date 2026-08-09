@@ -3,6 +3,7 @@ import { plainToInstance } from 'class-transformer';
 import { Post } from '@/modules/blog/entities/post.entity';
 import { PostDetailDto } from '@/modules/blog/post/dto/post-detail.dto';
 import { PostListItemDto } from '@/modules/blog/post/dto/post-list-item.dto';
+import { PostListQueryDto } from '@/modules/blog/post/dto/post-list-query.dto';
 import { PostRepository } from '@/modules/blog/post/post.repository';
 import { PostTagRepository } from '@/modules/blog/post/post-tag.repository';
 
@@ -18,9 +19,25 @@ export class PostService {
     return this.toListItemDtos(posts);
   }
 
-  async findAll(): Promise<PostListItemDto[]> {
-    const posts = await this.postRepository.findAllPublished();
-    return this.toListItemDtos(posts);
+  async findAll(query: PostListQueryDto) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 12;
+
+    const [posts, total] = await this.postRepository.findAllPublishedPaginated(
+      page,
+      limit,
+    );
+
+    return {
+      data: await this.toListItemDtos(posts),
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNextPage: page * limit < total,
+      },
+    };
   }
 
   async findBySlug(slug: string): Promise<PostDetailDto> {
