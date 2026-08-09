@@ -4,6 +4,8 @@ import { Post } from '@/modules/blog/entities/post.entity';
 import { PostTag } from '@/modules/blog/entities/post-tag.entity';
 import { Tag } from '@/modules/blog/entities/tag.entity';
 import { Series } from '@/modules/blog/entities/series.entity';
+import { AdminPostController } from './admin-post.controller';
+import { AdminPostService } from './admin-post.service';
 import { PostController } from './post.controller';
 import { PostService } from '@/modules/blog/post/post.service';
 import { PostRepository } from '@/modules/blog/post/post.repository';
@@ -11,9 +13,9 @@ import { PostTagRepository } from '@/modules/blog/post/post-tag.repository';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Post, PostTag, Tag, Series])],
-  controllers: [PostController],
-  providers: [PostRepository, PostTagRepository, PostService],
-  exports: [PostRepository, PostService],
+  controllers: [PostController, AdminPostController],
+  providers: [PostRepository, PostTagRepository, PostService, AdminPostService],
+  exports: [PostRepository, PostService, AdminPostService],
 })
 
 export class PostModule {}

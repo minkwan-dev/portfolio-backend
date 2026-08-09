@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { FindOptionsWhere, Repository } from "typeorm";
 import { Post } from '@/modules/blog/entities/post.entity';
 
 const POST_LIST_SELECT = {
@@ -9,6 +9,13 @@ const POST_LIST_SELECT = {
     urlSlug: true,
     thumbnail: true,
     releasedAt: true,
+} as const;
+
+const ADMIN_POST_LIST_SELECT = {
+    ...POST_LIST_SELECT,
+    isTemp: true,
+    isMain: true,
+    mainOrder: true,
 } as const;
 
 @Injectable()
@@ -40,6 +47,27 @@ export class PostRepository {
             skip: (page - 1) * limit,
             take: limit,
         })
+    }
+
+    findAllAdminPaginated(
+        page: number,
+        limit: number,
+        isTemp?: boolean,
+    ): Promise<[Post[], number]> {
+        const where: FindOptionsWhere<Post> = {};
+        if (isTemp !== undefined) where.isTemp = isTemp;
+
+        return this.repository.findAndCount({
+            select: ADMIN_POST_LIST_SELECT,
+            where,
+            order: { releasedAt: 'DESC', id: 'DESC' },
+            skip: (page - 1) * limit,
+            take: limit,
+        })
+    }
+
+    findById(id: number): Promise<Post | null> {
+        return this.repository.findOne({ where: { id } })
     }
 
     findPublishedBySlug(slug: string): Promise<Post | null> {
