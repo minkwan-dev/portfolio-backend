@@ -70,6 +70,24 @@ export class PostRepository {
         return this.repository.findOne({ where: { id } })
     }
 
+    findByUrlSlug(urlSlug: string): Promise<Post | null> {
+        return this.repository.findOne({ where: { urlSlug } })
+    }
+
+    create(data: Partial<Post>): Promise<Post> {
+        const entity = this.repository.create(data)
+        return this.repository.save(entity)
+    }
+
+    async updateById(id: number, data: Partial<Post>): Promise<Post | null> {
+        await this.repository.update({ id }, data)
+        return this.findById(id)
+    }
+
+    async deleteById(id: number): Promise<void> {
+        await this.repository.delete({ id })
+    }
+
     findPublishedBySlug(slug: string): Promise<Post | null> {
         return this.repository.findOne({
             where: { urlSlug: slug, isTemp: false },

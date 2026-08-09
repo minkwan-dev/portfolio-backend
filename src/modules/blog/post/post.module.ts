@@ -10,11 +10,12 @@ import { PostController } from './post.controller';
 import { PostService } from '@/modules/blog/post/post.service';
 import { PostRepository } from '@/modules/blog/post/post.repository';
 import { PostTagRepository } from '@/modules/blog/post/post-tag.repository';
+import { TagRepository } from '@/modules/blog/post/tag.repository';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Post, PostTag, Tag, Series])],
   controllers: [PostController, AdminPostController],
-  providers: [PostRepository, PostTagRepository, PostService, AdminPostService],
+  providers: [PostRepository, PostTagRepository, TagRepository, PostService, AdminPostService],
   exports: [PostRepository, PostService, AdminPostService],
 })
 

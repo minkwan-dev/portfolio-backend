@@ -28,4 +28,14 @@ export class PostTagRepository {
 
         return map;
     }
+
+    async replaceForPost(postId: number, tagIds: number[]): Promise<void> {
+        await this.repository.delete({ postId });
+
+        if (tagIds.length === 0) return;
+
+        await this.repository.save(
+            tagIds.map((tagId) => ({ postId, tagId })),
+        );
+    }
 }
