@@ -8,14 +8,17 @@ import {
   IsOptional,
   IsString,
   MaxLength,
+  ValidateIf,
 } from 'class-validator';
 
 export class CreateAdminPostDto {
+  @ValidateIf((dto) => !dto.isTemp)
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
   title: string;
 
+  @ValidateIf((dto) => !dto.isTemp)
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
@@ -31,6 +34,7 @@ export class CreateAdminPostDto {
   @MaxLength(2048)
   thumbnail?: string | null;
 
+  @ValidateIf((dto) => !dto.isTemp)
   @IsString()
   @IsNotEmpty()
   body: string;

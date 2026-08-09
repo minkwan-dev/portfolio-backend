@@ -53,14 +53,19 @@ export class AdminPostService {
   }
 
   async create(dto: CreateAdminPostDto): Promise<AdminPostDetailDto> {
-    await this.assertUniqueSlug(dto.urlSlug);
+    const title = dto.title?.trim() || '제목 없음';
+    const urlSlug =
+      dto.urlSlug?.trim() ||
+      `draft-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+    await this.assertUniqueSlug(urlSlug);
 
     const post = await this.postRepository.create({
-      title: dto.title,
-      urlSlug: dto.urlSlug,
+      title,
+      urlSlug,
       shortDescription: dto.shortDescription ?? null,
       thumbnail: dto.thumbnail ?? null,
-      body: dto.body,
+      body: dto.body?.trim() || ' ',
       isTemp: dto.isTemp,
       isMain: dto.isMain ?? false,
       mainOrder: dto.mainOrder ?? null,
