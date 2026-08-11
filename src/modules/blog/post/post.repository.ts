@@ -94,10 +94,4 @@ export class PostRepository {
             relations: { series: true },
         })
     }
-
-    findPublishedById(id: number): Promise<Post | null> {
-        return this.repository.findOne({
-            where: { id, isTemp: false },
-        })
-    }
 }
