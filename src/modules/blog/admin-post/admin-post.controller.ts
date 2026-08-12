@@ -20,36 +20,40 @@ export class AdminPostController {
   constructor(private readonly adminPostService: AdminPostService) {}
 
   @Get()
-  findAll(@Query() query: AdminPostListQueryDto) {
-    return this.adminPostService.findAll(query);
+  async findAll(@Query() query: AdminPostListQueryDto) {
+      return this.adminPostService.findAll(query);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.adminPostService.findById(id).then((data) => ({ data }));
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+      const data = await this.adminPostService.findById(id);
+      return { data };
   }
 
   @Post()
-  create(@Body() dto: CreateAdminPostDto) {
-    return this.adminPostService.create(dto).then((data) => ({ data }));
+  async create(@Body() dto: CreateAdminPostDto) {
+      const data = await this.adminPostService.create(dto);
+      return { data };
   }
 
   @Patch(':id/restore')
-  restore(@Param('id', ParseIntPipe) id: number) {
-    return this.adminPostService.restore(id).then((data) => ({ data }));
+  async restore(@Param('id', ParseIntPipe) id: number) {
+      const data = await this.adminPostService.restore(id);
+      return { data };
   }
 
   @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateAdminPostDto,
+  async update(
+      @Param('id', ParseIntPipe) id: number,
+      @Body() dto: UpdateAdminPostDto,
   ) {
-    return this.adminPostService.update(id, dto).then((data) => ({ data }));
+      const data = await this.adminPostService.update(id, dto);
+      return { data };
   }
 
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
-    await this.adminPostService.remove(id);
-    return { data: null };
+      await this.adminPostService.remove(id);
+      return { data: null };
   }
 }
