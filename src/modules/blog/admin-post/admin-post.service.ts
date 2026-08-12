@@ -14,6 +14,10 @@ import { CreateAdminPostDto } from './dto/create-admin-post.dto';
 import { UpdateAdminPostDto } from './dto/update-admin-post.dto';
 import { TagRepository } from './tag.repository';
 
+type PostWithTags = Post & { tags: string[] };
+
+const PLAIN_TO_INSTANCE_OPTIONS = { excludeExtraneousValues: true } as const;
+
 @Injectable()
 export class AdminPostService {
   constructor(
@@ -32,8 +36,10 @@ export class AdminPostService {
       { isTemp: query.isTemp, isDeleted: query.isDeleted },
     );
 
+    const sources = await this.attachTags(posts);
+
     return {
-      data: await this.toListItemDtos(posts),
+      data: this.toListItemDtos(sources),
       meta: {
         page,
         limit,
@@ -48,33 +54,19 @@ export class AdminPostService {
     const post = await this.postRepository.findById(id);
     if (!post) throw new NotFoundException(`Post not found: ${id}`);
 
-    const tagMap = await this.postTagRepository.findTagNamesByPostIds([post.id]);
-    return this.toDetailDto(post, tagMap.get(post.id) ?? []);
+    const [postWithTags] = await this.attachTags([post]);
+    return this.toDetailDto(postWithTags);
   }
 
   async create(dto: CreateAdminPostDto): Promise<AdminPostDetailDto> {
-    const title = dto.title?.trim() || '제목 없음';
-    const urlSlug =
-      dto.urlSlug?.trim() ||
-      `draft-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const { tags, ...input } = dto;
+    const payload = this.buildCreatePayload(input);
 
-    await this.assertUniqueSlug(urlSlug);
+    await this.assertUniqueSlug(payload.urlSlug!);
 
-    const post = await this.postRepository.create({
-      title,
-      urlSlug,
-      shortDescription: dto.shortDescription ?? null,
-      thumbnail: dto.thumbnail ?? null,
-      body: dto.body?.trim() || ' ',
-      isTemp: dto.isTemp,
-      isMain: dto.isMain ?? false,
-      mainOrder: dto.mainOrder ?? null,
-      releasedAt: dto.releasedAt ?? null,
-      seriesId: dto.seriesId ?? null,
-      seriesOrder: dto.seriesOrder ?? null,
-    });
+    const post = await this.postRepository.create(payload);
+    await this.syncTags(post.id, tags);
 
-    await this.syncTags(post.id, dto.tags);
     return this.findById(post.id);
   }
 
@@ -86,13 +78,15 @@ export class AdminPostService {
       await this.assertUniqueSlug(dto.urlSlug, id);
     }
 
-    const updatePayload = this.buildUpdatePayload(dto);
+    const { tags, ...input } = dto;
+    const updatePayload = this.buildUpdatePayload(input);
+
     if (Object.keys(updatePayload).length > 0) {
       const updated = await this.postRepository.updateById(id, updatePayload);
       if (!updated) throw new NotFoundException(`Post not found: ${id}`);
     }
 
-    if (dto.tags) await this.syncTags(id, dto.tags);
+    if (tags) await this.syncTags(id, tags);
 
     return this.findById(id);
   }
@@ -122,7 +116,38 @@ export class AdminPostService {
     return this.findById(id);
   }
 
-  private buildUpdatePayload(dto: UpdateAdminPostDto): Partial<Post> {
+  private async attachTags(posts: Post[]): Promise<PostWithTags[]> {
+    const tagMap = await this.postTagRepository.findTagNamesByPostIds(
+      posts.map((p) => p.id),
+    );
+
+    return posts.map((post) => ({
+      ...post,
+      tags: tagMap.get(post.id) ?? [],
+    }));
+  }
+
+  private buildCreatePayload(
+    dto: Omit<CreateAdminPostDto, 'tags'>,
+  ): Partial<Post> {
+    return {
+      title: dto.title?.trim() || '제목 없음',
+      urlSlug:
+        dto.urlSlug?.trim() ||
+        `draft-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      shortDescription: dto.shortDescription ?? null,
+      thumbnail: dto.thumbnail ?? null,
+      body: dto.body?.trim() || ' ',
+      isTemp: dto.isTemp,
+      isMain: dto.isMain ?? false,
+      mainOrder: dto.mainOrder ?? null,
+      releasedAt: dto.releasedAt ?? null,
+      seriesId: dto.seriesId ?? null,
+      seriesOrder: dto.seriesOrder ?? null,
+    };
+  }
+
+  private buildUpdatePayload(dto: Omit<UpdateAdminPostDto, 'tags'>): Partial<Post> {
     const payload: Partial<Post> = {};
 
     if (dto.title !== undefined) payload.title = dto.title;
@@ -160,51 +185,15 @@ export class AdminPostService {
     );
   }
 
-  private async toListItemDtos(posts: Post[]): Promise<AdminPostListItemDto[]> {
-    if (posts.length === 0) return [];
-
-    const tagMap = await this.postTagRepository.findTagNamesByPostIds(
-      posts.map((p) => p.id),
-    );
-
-    return posts.map((post) =>
-      plainToInstance(
-        AdminPostListItemDto,
-        {
-          id: post.id,
-          title: post.title,
-          urlSlug: post.urlSlug,
-          thumbnail: post.thumbnail,
-          isTemp: post.isTemp,
-          isMain: post.isMain,
-          mainOrder: post.mainOrder,
-          releasedAt: post.releasedAt,
-          tags: tagMap.get(post.id) ?? [],
-        },
-        { excludeExtraneousValues: true },
-      ),
-    );
+  private toListItemDto(source: PostWithTags): AdminPostListItemDto {
+    return plainToInstance(AdminPostListItemDto, source, PLAIN_TO_INSTANCE_OPTIONS);
   }
 
-  private toDetailDto(post: Post, tags: string[]): AdminPostDetailDto {
-    return plainToInstance(
-      AdminPostDetailDto,
-      {
-        id: post.id,
-        title: post.title,
-        urlSlug: post.urlSlug,
-        shortDescription: post.shortDescription,
-        thumbnail: post.thumbnail,
-        body: post.body,
-        isTemp: post.isTemp,
-        isMain: post.isMain,
-        mainOrder: post.mainOrder,
-        releasedAt: post.releasedAt,
-        seriesId: post.seriesId,
-        seriesOrder: post.seriesOrder,
-        tags,
-      },
-      { excludeExtraneousValues: true },
-    );
+  private toListItemDtos(sources: PostWithTags[]): AdminPostListItemDto[] {
+    return sources.map((source) => this.toListItemDto(source));
+  }
+
+  private toDetailDto(source: PostWithTags): AdminPostDetailDto {
+    return plainToInstance(AdminPostDetailDto, source, PLAIN_TO_INSTANCE_OPTIONS);
   }
 }
