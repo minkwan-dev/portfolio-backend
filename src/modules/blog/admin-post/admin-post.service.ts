@@ -5,14 +5,14 @@ import {
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
 import { Post } from '@/modules/blog/entities/post.entity';
-import { AdminPostDetailDto } from '@/modules/blog/post/dto/admin-post-detail.dto';
-import { AdminPostListItemDto } from '@/modules/blog/post/dto/admin-post-list-item.dto';
-import { AdminPostListQueryDto } from '@/modules/blog/post/dto/admin-post-list-query.dto';
-import { CreateAdminPostDto } from '@/modules/blog/post/dto/create-admin-post.dto';
-import { UpdateAdminPostDto } from '@/modules/blog/post/dto/update-admin-post.dto';
 import { PostRepository } from '@/modules/blog/post/post.repository';
 import { PostTagRepository } from '@/modules/blog/post/post-tag.repository';
-import { TagRepository } from '@/modules/blog/post/tag.repository';
+import { AdminPostDetailDto } from './dto/admin-post-detail.dto';
+import { AdminPostListItemDto } from './dto/admin-post-list-item.dto';
+import { AdminPostListQueryDto } from './dto/admin-post-list-query.dto';
+import { CreateAdminPostDto } from './dto/create-admin-post.dto';
+import { UpdateAdminPostDto } from './dto/update-admin-post.dto';
+import { TagRepository } from './tag.repository';
 
 @Injectable()
 export class AdminPostService {

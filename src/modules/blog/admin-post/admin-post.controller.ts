@@ -8,13 +8,11 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { AdminPostService } from './admin-post.service';
 import { AdminPostListQueryDto } from './dto/admin-post-list-query.dto';
 import { CreateAdminPostDto } from './dto/create-admin-post.dto';
 import { UpdateAdminPostDto } from './dto/update-admin-post.dto';
-import { AdminTokenGuard } from './guards/admin-token.guard';
 
 // @UseGuards(AdminTokenGuard)
 @Controller('admin/posts')
