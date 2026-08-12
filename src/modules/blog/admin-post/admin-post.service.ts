@@ -178,7 +178,13 @@ export class AdminPostService {
   }
 
   private async syncTags(postId: number, tagNames: string[]): Promise<void> {
-    const tags = await this.tagRepository.findOrCreateByNames(tagNames);
+    const uniqueNames = [
+      ...new Set(tagNames.map((name) => name.trim()).filter(Boolean)),
+    ];
+  
+    await this.tagRepository.createIgnoringDuplicates(uniqueNames);
+    const tags = await this.tagRepository.findByNames(uniqueNames);
+  
     await this.postTagRepository.replaceForPost(
       postId,
       tags.map((tag) => tag.id),

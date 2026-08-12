@@ -15,19 +15,15 @@ export class TagRepository {
     return this.repository.find({ where: { name: In(names) } });
   }
 
-  async findOrCreateByNames(names: string[]): Promise<Tag[]> {
-    const uniqueNames = [...new Set(names.map((name) => name.trim()).filter(Boolean))];
-    
-    if (uniqueNames.length === 0) return [];
+  async createIgnoringDuplicates(names: string[]): Promise<void> {
+    if (names.length === 0) return;
 
     await this.repository
       .createQueryBuilder()
       .insert()
       .into(Tag)
-      .values(uniqueNames.map((name) => ({ name })))
+      .values(names.map((name) => ({ name })))
       .orIgnore()
       .execute();
-
-    return this.findByNames(uniqueNames);
   }
 }
