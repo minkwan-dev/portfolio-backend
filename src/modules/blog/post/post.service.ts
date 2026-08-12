@@ -7,6 +7,11 @@ import { PostListQueryDto } from '@/modules/blog/post/dto/post-list-query.dto';
 import { PostRepository } from '@/modules/blog/post/post.repository';
 import { PostTagRepository } from '@/modules/blog/post/post-tag.repository';
 
+type PostListItemSource = Pick<
+  Post,
+  'id' | 'title' | 'urlSlug' | 'thumbnail' | 'releasedAt'
+> & { tags: string[] };
+
 @Injectable()
 export class PostService {
   constructor(
@@ -16,7 +21,8 @@ export class PostService {
 
   async findMain(): Promise<PostListItemDto[]> {
     const posts = await this.postRepository.findMain();
-    return this.toListItemDtos(posts);
+    const sources = await this.attachTags(posts);
+    return this.toListItemDtos(sources);
   }
 
   async findAll(query: PostListQueryDto) {
@@ -28,8 +34,10 @@ export class PostService {
       limit,
     );
 
+    const sources = await this.attachTags(posts);
+
     return {
-      data: await this.toListItemDtos(posts),
+      data: this.toListItemDtos(sources),
       meta: {
         page,
         limit,
@@ -48,27 +56,25 @@ export class PostService {
     return this.toDetailDto(post, tagMap.get(post.id) ?? []);
   }
 
-  private async toListItemDtos(posts: Post[]): Promise<PostListItemDto[]> {
-    if (posts.length === 0) return [];
-
+  private async attachTags(posts: Post[]): Promise<PostListItemSource[]> {
     const tagMap = await this.postTagRepository.findTagNamesByPostIds(
       posts.map((p) => p.id),
     );
 
-    return posts.map((post) =>
-      plainToInstance(
-        PostListItemDto,
-        {
-          id: post.id,
-          title: post.title,
-          urlSlug: post.urlSlug,
-          thumbnail: post.thumbnail,
-          releasedAt: post.releasedAt,
-          tags: tagMap.get(post.id) ?? [],
-        },
-        { excludeExtraneousValues: true },
-      ),
-    );
+    return posts.map((post) => ({
+      ...post,
+      tags: tagMap.get(post.id) ?? [],
+    }));
+  }
+
+  private toListItemDto(source: PostListItemSource): PostListItemDto {
+    return plainToInstance(PostListItemDto, source, {
+      excludeExtraneousValues: true,
+    });
+  }
+
+  private toListItemDtos(sources: PostListItemSource[]): PostListItemDto[] {
+    return sources.map((source) => this.toListItemDto(source));
   }
 
   private toDetailDto(post: Post, tags: string[]): PostDetailDto {
