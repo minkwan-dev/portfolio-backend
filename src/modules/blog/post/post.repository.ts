@@ -36,16 +36,13 @@ export class PostRepository {
         })
     }
 
-    findAllPublishedPaginated(
-        page: number,
-        limit: number,
-    ): Promise<[Post[], number]> {
-        return this.repository.findAndCount({
+    findPublishedPage(page: number, limit: number): Promise<Post[]> {
+        return this.repository.find({
             select: POST_LIST_SELECT,
             where: { isTemp: false },
             order: { releasedAt: 'DESC' },
             skip: (page - 1) * limit,
-            take: limit,
+            take: limit + 1,
         })
     }
 

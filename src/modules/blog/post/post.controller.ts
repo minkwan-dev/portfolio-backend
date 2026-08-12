@@ -13,8 +13,8 @@ export class PostController {
     }
 
     @Get()
-    async findAll(@Query() query: PostListQueryDto) {
-        return this.postService.findAll(query);
+    async findPublishedPage(@Query() query: PostListQueryDto) {
+        return this.postService.findPublishedPage(query);
     }
 
     @Get(':slug')

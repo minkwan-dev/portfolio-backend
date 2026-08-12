@@ -25,14 +25,14 @@ export class PostService {
     return this.toListItemDtos(sources);
   }
 
-  async findAll(query: PostListQueryDto) {
+  async findPublishedPage(query: PostListQueryDto) {
     const page = query.page ?? 1;
     const limit = query.limit ?? 12;
 
-    const [posts, total] = await this.postRepository.findAllPublishedPaginated(
-      page,
-      limit,
-    );
+    const rows = await this.postRepository.findPublishedPage(page, limit);
+
+    const hasNextPage = rows.length > limit;
+    const posts = rows.slice(0, limit);
 
     const sources = await this.attachTags(posts);
 
@@ -41,9 +41,7 @@ export class PostService {
       meta: {
         page,
         limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-        hasNextPage: page * limit < total,
+        hasNextPage,
       },
     };
   }

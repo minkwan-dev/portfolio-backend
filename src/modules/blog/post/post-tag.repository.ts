@@ -13,6 +13,7 @@ export class PostTagRepository {
     async findTagNamesByPostIds(postIds: number[]): Promise<Map<number, string[]>> {
         if (postIds.length === 0) return new Map();
 
+        // [1, 99] [1, 67], [2, 78]
         const links = await this.repository.find({
             where: { postId: In(postIds) },
             relations: { tag: true },
