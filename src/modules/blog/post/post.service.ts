@@ -7,10 +7,7 @@ import { PostListQueryDto } from '@/modules/blog/post/dto/post-list-query.dto';
 import { PostRepository } from '@/modules/blog/post/post.repository';
 import { PostTagRepository } from '@/modules/blog/post/post-tag.repository';
 
-type PostListItemSource = Pick<
-  Post,
-  'id' | 'title' | 'urlSlug' | 'thumbnail' | 'releasedAt'
-> & { tags: string[] };
+type PostWithTags = Post & { tags: string[] };
 
 @Injectable()
 export class PostService {
@@ -50,11 +47,11 @@ export class PostService {
     const post = await this.postRepository.findPublishedBySlug(slug);
     if (!post) throw new NotFoundException(`Post not found: ${slug}`);
 
-    const tagMap = await this.postTagRepository.findTagNamesByPostIds([post.id]);
-    return this.toDetailDto(post, tagMap.get(post.id) ?? []);
+    const [postWithTags] = await this.attachTags([post]);
+    return this.toDetailDto(postWithTags);
   }
 
-  private async attachTags(posts: Post[]): Promise<PostListItemSource[]> {
+  private async attachTags(posts: Post[]): Promise<PostWithTags[]> {
     const tagMap = await this.postTagRepository.findTagNamesByPostIds(
       posts.map((p) => p.id),
     );
@@ -65,17 +62,17 @@ export class PostService {
     }));
   }
 
-  private toListItemDto(source: PostListItemSource): PostListItemDto {
+  private toListItemDto(source: PostWithTags): PostListItemDto {
     return plainToInstance(PostListItemDto, source, {
       excludeExtraneousValues: true,
     });
   }
 
-  private toListItemDtos(sources: PostListItemSource[]): PostListItemDto[] {
+  private toListItemDtos(sources: PostWithTags[]): PostListItemDto[] {
     return sources.map((source) => this.toListItemDto(source));
   }
 
-  private toDetailDto(post: Post, tags: string[]): PostDetailDto {
+  private toDetailDto(post: PostWithTags): PostDetailDto {
     return plainToInstance(
       PostDetailDto,
       {
@@ -87,7 +84,7 @@ export class PostService {
         body: post.body,
         releasedAt: post.releasedAt,
         commentsCount: post.commentsCount,
-        tags,
+        tags: post.tags,
         series: post.series
           ? {
               name: post.series.name,
