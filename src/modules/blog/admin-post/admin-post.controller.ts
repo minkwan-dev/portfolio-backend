@@ -34,6 +34,11 @@ export class AdminPostController {
     return this.adminPostService.create(dto).then((data) => ({ data }));
   }
 
+  @Patch(':id/restore')
+  restore(@Param('id', ParseIntPipe) id: number) {
+    return this.adminPostService.restore(id).then((data) => ({ data }));
+  }
+
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,

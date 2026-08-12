@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, DeleteDateColumn, Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { BaseEntity } from '@/modules/database/base.entity';
 import { Series } from '@/modules/blog/entities/series.entity';
 
@@ -39,6 +39,9 @@ export class Post extends BaseEntity {
 
     @Column({ name: 'released_at', type: 'datetime', nullable: true })
     releasedAt: Date | null;
+
+    @DeleteDateColumn({ name: 'deleted_at' })
+    deletedAt: Date | null;
 
     @ManyToOne(() => Series, { nullable: true })
     @JoinColumn({ name: 'series_id' })

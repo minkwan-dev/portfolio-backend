@@ -29,7 +29,7 @@ export class AdminPostService {
     const [posts, total] = await this.postRepository.findAllAdminPaginated(
       page,
       limit,
-      query.isTemp,
+      { isTemp: query.isTemp, isDeleted: query.isDeleted },
     );
 
     return {
@@ -101,7 +101,25 @@ export class AdminPostService {
     const post = await this.postRepository.findById(id);
     if (!post) throw new NotFoundException(`Post not found: ${id}`);
 
-    await this.postRepository.deleteById(id);
+    await this.postRepository.softDeleteById(id);
+  }
+
+  async restore(id: number): Promise<AdminPostDetailDto> {
+    const post = await this.postRepository.findByIdWithDeleted(id);
+    if (!post?.deletedAt) {
+      throw new NotFoundException(`Deleted post not found: ${id}`);
+    }
+
+    const restoredSlug = post.urlSlug.replace(/__deleted__\d+$/, '');
+    const existing = await this.postRepository.findByUrlSlug(restoredSlug);
+    if (existing) {
+      throw new ConflictException(`Slug already exists: ${restoredSlug}`);
+    }
+
+    await this.postRepository.updateById(id, { urlSlug: restoredSlug });
+    await this.postRepository.recoverById(id);
+
+    return this.findById(id);
   }
 
   private buildUpdatePayload(dto: UpdateAdminPostDto): Partial<Post> {
