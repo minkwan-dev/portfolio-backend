@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
+import { DataSource, EntityManager } from 'typeorm';
 import { Post } from '@/modules/blog/entities/post.entity';
 import { PostRepository } from '@/modules/blog/post/post.repository';
 import { PostTagRepository } from '@/modules/blog/post/post-tag.repository';
@@ -24,6 +25,7 @@ export class AdminPostService {
     private readonly postRepository: PostRepository,
     private readonly postTagRepository: PostTagRepository,
     private readonly tagRepository: TagRepository,
+    private readonly dataSource: DataSource,
   ) {}
 
   async findAll(query: AdminPostListQueryDto) {
@@ -64,10 +66,13 @@ export class AdminPostService {
 
     await this.assertUniqueSlug(payload.urlSlug!);
 
-    const post = await this.postRepository.create(payload);
-    await this.syncTags(post.id, tags);
+    const postId = await this.dataSource.transaction(async (manager) => {
+      const post = await this.postRepository.create(payload, manager);
+      await this.syncTags(post.id, tags, manager);
+      return post.id;
+    });
 
-    return this.findById(post.id);
+    return this.findById(postId);
   }
 
   async update(id: number, dto: UpdateAdminPostDto): Promise<AdminPostDetailDto> {
@@ -81,12 +86,18 @@ export class AdminPostService {
     const { tags, ...input } = dto;
     const updatePayload = this.buildUpdatePayload(input);
 
-    if (Object.keys(updatePayload).length > 0) {
-      const updated = await this.postRepository.updateById(id, updatePayload);
-      if (!updated) throw new NotFoundException(`Post not found: ${id}`);
-    }
+    await this.dataSource.transaction(async (manager) => {
+      if (Object.keys(updatePayload).length > 0) {
+        const updated = await this.postRepository.updateById(
+          id,
+          updatePayload,
+          manager,
+        );
+        if (!updated) throw new NotFoundException(`Post not found: ${id}`);
+      }
 
-    if (tags) await this.syncTags(id, tags);
+      if (tags) await this.syncTags(id, tags, manager);
+    });
 
     return this.findById(id);
   }
@@ -177,17 +188,22 @@ export class AdminPostService {
     }
   }
 
-  private async syncTags(postId: number, tagNames: string[]): Promise<void> {
+  private async syncTags(
+    postId: number,
+    tagNames: string[],
+    manager?: EntityManager,
+  ): Promise<void> {
     const uniqueNames = [
       ...new Set(tagNames.map((name) => name.trim()).filter(Boolean)),
     ];
-  
-    await this.tagRepository.createIgnoringDuplicates(uniqueNames);
-    const tags = await this.tagRepository.findByNames(uniqueNames);
-  
+
+    await this.tagRepository.createIgnoringDuplicates(uniqueNames, manager);
+    const tags = await this.tagRepository.findByNames(uniqueNames, manager);
+
     await this.postTagRepository.replaceForPost(
       postId,
       tags.map((tag) => tag.id),
+      manager,
     );
   }
 

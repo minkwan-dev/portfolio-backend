@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, IsNull, Not, Repository } from 'typeorm';
+import { EntityManager, FindOptionsWhere, IsNull, Not, Repository } from 'typeorm';
 import { Post } from '@/modules/blog/entities/post.entity';
 
 const POST_LIST_SELECT = {
@@ -81,14 +81,20 @@ export class PostRepository {
     return this.repository.findOne({ where: { urlSlug } });
   }
 
-  create(data: Partial<Post>): Promise<Post> {
-    const entity = this.repository.create(data);
-    return this.repository.save(entity);
+  create(data: Partial<Post>, manager?: EntityManager): Promise<Post> {
+    const repo = this.repo(manager);
+    const entity = repo.create(data);
+    return repo.save(entity);
   }
 
-  async updateById(id: number, data: Partial<Post>): Promise<Post | null> {
-    await this.repository.update({ id }, data);
-    return this.findById(id);
+  async updateById(
+    id: number,
+    data: Partial<Post>,
+    manager?: EntityManager,
+  ): Promise<Post | null> {
+    const repo = this.repo(manager);
+    await repo.update({ id }, data);
+    return repo.findOne({ where: { id } });
   }
 
   async softDeleteById(id: number): Promise<void> {
@@ -116,5 +122,9 @@ export class PostRepository {
       where: { urlSlug: slug, isTemp: false },
       relations: { series: true },
     });
+  }
+
+  private repo(manager?: EntityManager): Repository<Post> {
+    return manager ? manager.getRepository(Post) : this.repository;
   }
 }
