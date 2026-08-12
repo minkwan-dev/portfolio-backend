@@ -16,25 +16,18 @@ export class TagRepository {
   }
 
   async findOrCreateByNames(names: string[]): Promise<Tag[]> {
-    const normalized = [
-      ...new Set(names.map((name) => name.trim()).filter(Boolean)),
-    ];
-    if (normalized.length === 0) return [];
-
-    const existing = await this.findByNames(normalized);
-    const existingNames = new Set(existing.map((tag) => tag.name));
-    const missing = normalized.filter((name) => !existingNames.has(name));
-
-    if (missing.length === 0) return existing;
+    const uniqueNames = [...new Set(names.map((name) => name.trim()).filter(Boolean))];
+    
+    if (uniqueNames.length === 0) return [];
 
     await this.repository
       .createQueryBuilder()
       .insert()
       .into(Tag)
-      .values(missing.map((name) => ({ name })))
+      .values(uniqueNames.map((name) => ({ name })))
       .orIgnore()
       .execute();
 
-    return this.findByNames(normalized);
+    return this.findByNames(uniqueNames);
   }
 }
