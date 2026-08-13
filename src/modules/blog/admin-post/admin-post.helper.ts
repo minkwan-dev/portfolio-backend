@@ -44,7 +44,7 @@ export class AdminPostHelper {
     return {
       title,
       urlSlug,
-      shortDescription: dto.shortDescription ?? null,
+      shortDescription: null,
       thumbnail: dto.thumbnail ?? null,
       body: dto.body?.trim() || ' ',
       isTemp: dto.isTemp,
@@ -64,9 +64,6 @@ export class AdminPostHelper {
     const nextIsTemp = dto.isTemp ?? post.isTemp;
 
     if (dto.title !== undefined) payload.title = dto.title;
-    if (dto.shortDescription !== undefined) {
-      payload.shortDescription = dto.shortDescription;
-    }
     if (dto.thumbnail !== undefined) payload.thumbnail = dto.thumbnail;
     if (dto.body !== undefined) payload.body = dto.body;
     if (dto.isTemp !== undefined) payload.isTemp = dto.isTemp;
@@ -81,6 +78,7 @@ export class AdminPostHelper {
     }
 
     payload.releasedAt = resolveReleasedAt(nextIsTemp);
+    payload.shortDescription = null;
 
     return payload;
   }

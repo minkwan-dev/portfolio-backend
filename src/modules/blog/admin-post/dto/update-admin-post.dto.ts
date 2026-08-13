@@ -26,12 +26,6 @@ export class UpdateAdminPostDto {
   @IsOptional()
   @ValidateIf((_, value) => value !== null)
   @IsString()
-  @MaxLength(255)
-  shortDescription?: string | null;
-
-  @IsOptional()
-  @ValidateIf((_, value) => value !== null)
-  @IsString()
   @MaxLength(2048)
   thumbnail?: string | null;
 

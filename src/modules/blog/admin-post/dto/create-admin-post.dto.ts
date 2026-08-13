@@ -25,11 +25,6 @@ export class CreateAdminPostDto {
 
   @IsOptional()
   @IsString()
-  @MaxLength(255)
-  shortDescription?: string | null;
-
-  @IsOptional()
-  @IsString()
   @MaxLength(2048)
   thumbnail?: string | null;
 
