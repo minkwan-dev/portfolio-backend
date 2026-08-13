@@ -18,11 +18,10 @@ export class CreateAdminPostDto {
   @MaxLength(255)
   title: string;
 
-  @ValidateIf((dto) => !dto.isTemp)
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @MaxLength(255)
-  urlSlug: string;
+  urlSlug?: string;
 
   @IsOptional()
   @IsString()
@@ -52,6 +51,7 @@ export class CreateAdminPostDto {
   mainOrder?: number | null;
 
   @IsOptional()
+  @ValidateIf((_, value) => value !== null)
   @Type(() => Date)
   @IsDate()
   releasedAt?: Date | null;

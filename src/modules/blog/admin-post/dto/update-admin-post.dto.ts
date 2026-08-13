@@ -20,7 +20,6 @@ export class UpdateAdminPostDto {
 
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @MaxLength(255)
   urlSlug?: string;
 

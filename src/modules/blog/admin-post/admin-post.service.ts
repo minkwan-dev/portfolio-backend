@@ -54,8 +54,7 @@ export class AdminPostService {
   async create(dto: CreateAdminPostDto): Promise<AdminPostDetailDto> {
     const { tags, ...input } = dto;
     const payload = this.helper.buildCreatePayload(input);
-
-    await this.helper.assertUniqueSlug(payload.urlSlug!);
+    payload.urlSlug = await this.helper.findAvailableSlug(payload.urlSlug!);
 
     const post = await this.postRepository.create(payload);
     await this.helper.syncTags(post.id, tags);
@@ -87,12 +86,15 @@ export class AdminPostService {
     const post = await this.postRepository.findById(id);
     if (!post) throw new NotFoundException(`Post not found: ${id}`);
 
-    if (dto.urlSlug && dto.urlSlug !== post.urlSlug) {
-      await this.helper.assertUniqueSlug(dto.urlSlug, id);
-    }
-
     const { tags, ...input } = dto;
-    const updatePayload = this.helper.buildUpdatePayload(input);
+    const updatePayload = this.helper.buildUpdatePayload(post, input);
+
+    if (updatePayload.urlSlug) {
+      updatePayload.urlSlug = await this.helper.findAvailableSlug(
+        updatePayload.urlSlug,
+        id,
+      );
+    }
 
     if (Object.keys(updatePayload).length > 0) {
       const updated = await this.postRepository.updateById(id, updatePayload);
