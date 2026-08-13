@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { PostTag } from "../entities";
-import { EntityManager, In, Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 
 @Injectable()
 export class PostTagRepository {
@@ -30,18 +30,12 @@ export class PostTagRepository {
         return map;
     }
 
-    async replaceForPost(
-        postId: number,
-        tagIds: number[],
-        manager?: EntityManager,
-    ): Promise<void> {
-        const repo = manager ? manager.getRepository(PostTag) : this.repository;
-
-        await repo.delete({ postId });
+    async replaceForPost(postId: number, tagIds: number[]): Promise<void> {
+        await this.repository.delete({ postId });
 
         if (tagIds.length === 0) return;
 
-        await repo.save(
+        await this.repository.save(
             tagIds.map((tagId) => ({ postId, tagId })),
         );
     }

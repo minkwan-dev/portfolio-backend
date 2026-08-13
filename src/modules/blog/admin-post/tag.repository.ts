@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, In, Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Tag } from '@/modules/blog/entities/tag.entity';
 
 @Injectable()
@@ -10,27 +10,20 @@ export class TagRepository {
     private readonly repository: Repository<Tag>,
   ) {}
 
-  findByNames(names: string[], manager?: EntityManager): Promise<Tag[]> {
+  findByNames(names: string[]): Promise<Tag[]> {
     if (names.length === 0) return Promise.resolve([]);
-    return this.repo(manager).find({ where: { name: In(names) } });
+    return this.repository.find({ where: { name: In(names) } });
   }
 
-  async createIgnoringDuplicates(
-    names: string[],
-    manager?: EntityManager,
-  ): Promise<void> {
+  async createIgnoringDuplicates(names: string[]): Promise<void> {
     if (names.length === 0) return;
 
-    await this.repo(manager)
+    await this.repository
       .createQueryBuilder()
       .insert()
       .into(Tag)
       .values(names.map((name) => ({ name })))
       .orIgnore()
       .execute();
-  }
-
-  private repo(manager?: EntityManager): Repository<Tag> {
-    return manager ? manager.getRepository(Tag) : this.repository;
   }
 }

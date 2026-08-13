@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
+import { addTransactionalDataSource } from 'typeorm-transactional';
 import { DatabaseConfigService } from '@/modules/config/database/database-config.service';
 
 @Module({
@@ -21,8 +23,14 @@ import { DatabaseConfigService } from '@/modules/config/database/database-config
           synchronize: false,
         };
       },
+      dataSourceFactory: async (options) => {
+        if (!options) {
+          throw new Error('Invalid TypeORM options');
+        }
+
+        return addTransactionalDataSource(new DataSource(options));
+      },
     }),
   ],
 })
-
 export class DatabaseModule {}
