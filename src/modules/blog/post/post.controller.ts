@@ -18,7 +18,7 @@ export class PostController {
     }
 
     @Get(':slug')
-    async findOne(@Param('slug') slug: string) {
+    async findBySlug(@Param('slug') slug: string) {
         const data = await this.postService.findBySlug(slug);
         return { data };
     }

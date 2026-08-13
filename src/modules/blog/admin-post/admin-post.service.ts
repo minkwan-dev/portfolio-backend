@@ -64,6 +64,25 @@ export class AdminPostService {
   }
 
   @Transactional()
+  async restore(id: number): Promise<AdminPostDetailDto> {
+    const post = await this.postRepository.findByIdWithDeleted(id);
+    if (!post?.deletedAt) {
+      throw new NotFoundException(`Deleted post not found: ${id}`);
+    }
+
+    const restoredSlug = post.urlSlug.replace(/__deleted__\d+$/, '');
+    const existing = await this.postRepository.findByUrlSlug(restoredSlug);
+    if (existing) {
+      throw new ConflictException(`Slug already exists: ${restoredSlug}`);
+    }
+
+    await this.postRepository.updateById(id, { urlSlug: restoredSlug });
+    await this.postRepository.recoverById(id);
+
+    return this.findById(id);
+  }
+
+  @Transactional()
   async update(id: number, dto: UpdateAdminPostDto): Promise<AdminPostDetailDto> {
     const post = await this.postRepository.findById(id);
     if (!post) throw new NotFoundException(`Post not found: ${id}`);
@@ -91,24 +110,5 @@ export class AdminPostService {
     if (!post) throw new NotFoundException(`Post not found: ${id}`);
 
     await this.postRepository.softDeleteById(id);
-  }
-
-  @Transactional()
-  async restore(id: number): Promise<AdminPostDetailDto> {
-    const post = await this.postRepository.findByIdWithDeleted(id);
-    if (!post?.deletedAt) {
-      throw new NotFoundException(`Deleted post not found: ${id}`);
-    }
-
-    const restoredSlug = post.urlSlug.replace(/__deleted__\d+$/, '');
-    const existing = await this.postRepository.findByUrlSlug(restoredSlug);
-    if (existing) {
-      throw new ConflictException(`Slug already exists: ${restoredSlug}`);
-    }
-
-    await this.postRepository.updateById(id, { urlSlug: restoredSlug });
-    await this.postRepository.recoverById(id);
-
-    return this.findById(id);
   }
 }

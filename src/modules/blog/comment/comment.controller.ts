@@ -7,7 +7,7 @@ export class CommentController {
     constructor(private readonly commentService: CommentService) {}
 
     @Get('posts/:postSlug/comments')
-    async findByPost(@Param('postSlug') postSlug: string) {
+    async findByPostSlug(@Param('postSlug') postSlug: string) {
         const data = await this.commentService.findByPostSlug(postSlug);
         return { data };
     }

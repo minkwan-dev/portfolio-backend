@@ -21,39 +21,39 @@ export class AdminPostController {
 
   @Get()
   async findAll(@Query() query: AdminPostListQueryDto) {
-      return this.adminPostService.findAll(query);
+    return this.adminPostService.findAll(query);
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-      const data = await this.adminPostService.findById(id);
-      return { data };
+  async findById(@Param('id', ParseIntPipe) id: number) {
+    const data = await this.adminPostService.findById(id);
+    return { data };
   }
 
   @Post()
   async create(@Body() dto: CreateAdminPostDto) {
-      const data = await this.adminPostService.create(dto);
-      return { data };
+    const data = await this.adminPostService.create(dto);
+    return { data };
   }
 
   @Patch(':id/restore')
   async restore(@Param('id', ParseIntPipe) id: number) {
-      const data = await this.adminPostService.restore(id);
-      return { data };
+    const data = await this.adminPostService.restore(id);
+    return { data };
   }
 
   @Patch(':id')
   async update(
-      @Param('id', ParseIntPipe) id: number,
-      @Body() dto: UpdateAdminPostDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateAdminPostDto,
   ) {
-      const data = await this.adminPostService.update(id, dto);
-      return { data };
+    const data = await this.adminPostService.update(id, dto);
+    return { data };
   }
 
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
-      await this.adminPostService.remove(id);
-      return { data: null };
+    await this.adminPostService.remove(id);
+    return { data: null };
   }
 }
