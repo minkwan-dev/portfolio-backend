@@ -63,6 +63,7 @@ export class AdminPostService {
     return this.findById(post.id);
   }
 
+  @Transactional()
   async update(id: number, dto: UpdateAdminPostDto): Promise<AdminPostDetailDto> {
     const post = await this.postRepository.findById(id);
     if (!post) throw new NotFoundException(`Post not found: ${id}`);
