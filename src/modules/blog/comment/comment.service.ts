@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Transactional } from 'typeorm-transactional';
 import { PostRepository } from '@/modules/blog/post/post.repository';
 import { CommentHelper } from './comment.helper';
 import { CommentRepository } from './comment.repository';
@@ -23,6 +24,7 @@ export class CommentService {
     return this.helper.toDtos(comments);
   }
 
+  @Transactional()
   async create(postSlug: string, dto: CreateCommentDto): Promise<CommentDto> {
     const post = await this.postRepository.findPublishedBySlug(postSlug);
 
@@ -30,11 +32,18 @@ export class CommentService {
 
     this.helper.assertValidIdentity(dto.nickname, dto.avatar);
 
-    const saved = await this.commentRepository.createWithCountUpdate(post.id, {
+    const publishedPost = await this.postRepository.findPublishedById(post.id);
+    if (!publishedPost) {
+      throw new NotFoundException(`Post not found: id=${post.id}`);
+    }
+
+    const saved = await this.commentRepository.create(publishedPost.id, {
       nickname: dto.nickname,
       avatar: dto.avatar,
       body: dto.body,
     });
+
+    await this.postRepository.incrementCommentsCount(publishedPost.id);
 
     return this.helper.toDto(saved);
   }

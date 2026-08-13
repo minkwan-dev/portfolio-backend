@@ -81,6 +81,12 @@ export class PostRepository {
     return this.repository.findOne({ where: { urlSlug } });
   }
 
+  findPublishedById(id: number): Promise<Post | null> {
+    return this.repository.findOne({
+      where: { id, isTemp: false },
+    });
+  }
+
   create(data: Partial<Post>): Promise<Post> {
     const entity = this.repository.create(data);
     return this.repository.save(entity);
@@ -89,6 +95,10 @@ export class PostRepository {
   async updateById(id: number, data: Partial<Post>): Promise<Post | null> {
     await this.repository.update({ id }, data);
     return this.findById(id);
+  }
+
+  incrementCommentsCount(id: number): Promise<void> {
+    return this.repository.increment({ id }, 'commentsCount', 1).then(() => undefined);
   }
 
   async softDeleteById(id: number): Promise<void> {
