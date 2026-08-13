@@ -85,6 +85,7 @@ export class AdminPostService {
     return this.findById(id);
   }
 
+  @Transactional()
   async remove(id: number): Promise<void> {
     const post = await this.postRepository.findById(id);
     if (!post) throw new NotFoundException(`Post not found: ${id}`);
@@ -92,6 +93,7 @@ export class AdminPostService {
     await this.postRepository.softDeleteById(id);
   }
 
+  @Transactional()
   async restore(id: number): Promise<AdminPostDetailDto> {
     const post = await this.postRepository.findByIdWithDeleted(id);
     if (!post?.deletedAt) {
