@@ -24,6 +24,12 @@ export class AdminPostController {
     return this.adminPostService.findAll(query);
   }
 
+  @Get('stats')
+  async getStats() {
+    const data = await this.adminPostService.getStats();
+    return { data };
+  }
+
   @Get(':id')
   async findById(@Param('id', ParseIntPipe) id: number) {
     const data = await this.adminPostService.findById(id);

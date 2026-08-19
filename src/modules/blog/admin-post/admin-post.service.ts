@@ -8,6 +8,7 @@ import { PostRepository } from '@/modules/blog/post/post.repository';
 import { AdminPostHelper } from './admin-post.helper';
 import { AdminPostDetailDto } from './dto/admin-post-detail.dto';
 import { AdminPostListQueryDto } from './dto/admin-post-list-query.dto';
+import { AdminPostStatsDto } from './dto/admin-post-stats.dto';
 import { CreateAdminPostDto } from './dto/create-admin-post.dto';
 import { UpdateAdminPostDto } from './dto/update-admin-post.dto';
 
@@ -17,6 +18,17 @@ export class AdminPostService {
     private readonly postRepository: PostRepository,
     private readonly helper: AdminPostHelper,
   ) {}
+
+  async getStats(): Promise<AdminPostStatsDto> {
+    const [total, published, draft, main] = await Promise.all([
+      this.postRepository.countAdmin(),
+      this.postRepository.countAdmin({ isTemp: false }),
+      this.postRepository.countAdmin({ isTemp: true }),
+      this.postRepository.countAdmin({ isTemp: false, isMain: true }),
+    ]);
+
+    return { total, published, draft, main };
+  }
 
   async findAll(query: AdminPostListQueryDto) {
     const page = query.page ?? 1;

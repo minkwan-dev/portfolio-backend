@@ -46,6 +46,26 @@ export class PostRepository {
     });
   }
 
+  countAdmin(options?: {
+    isTemp?: boolean;
+    isMain?: boolean;
+    isDeleted?: boolean;
+  }): Promise<number> {
+    const where: FindOptionsWhere<Post> = {};
+
+    if (options?.isTemp !== undefined) where.isTemp = options.isTemp;
+    if (options?.isMain !== undefined) where.isMain = options.isMain;
+
+    if (options?.isDeleted) {
+      where.deletedAt = Not(IsNull());
+    }
+
+    return this.repository.count({
+      where,
+      withDeleted: options?.isDeleted === true,
+    });
+  }
+
   findAllAdminPaginated(
     page: number,
     limit: number,

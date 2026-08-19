@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsBoolean, IsInt, IsOptional, Max, Min } from 'class-validator';
+import { TransformQueryBoolean } from '../utils/query-boolean.util';
 
 export class AdminPostListQueryDto {
   @IsOptional()
@@ -16,12 +17,12 @@ export class AdminPostListQueryDto {
   limit?: number = 20;
 
   @IsOptional()
-  @Type(() => Boolean)
+  @TransformQueryBoolean()
   @IsBoolean()
   isTemp?: boolean;
 
   @IsOptional()
-  @Type(() => Boolean)
+  @TransformQueryBoolean()
   @IsBoolean()
   isDeleted?: boolean;
 }
